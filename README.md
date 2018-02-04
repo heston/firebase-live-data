@@ -31,30 +31,40 @@ pyrebase_config = {
 }
 
 app = pyrebase.initialize_app(pyrebase_config)
-connection = LiveData(app, 'my_db_path', event_prefix='fb')
+live = LiveData(app, '/my_data')
 
-# Get a snapshot of all data at the path, `my_db_path`.
+# Get a snapshot of all data at the path, `/my_data`.
 #
 # This also sets up a persistent push connection to the Firebase Realtime Database
 # at that path. Any updates under this path will trigger `blinker` events.
 #
-# This behaves somewhat like a normal Python dictionary.
-data = connection.get_data()
+# `data` is a local (greedy) cache of the data at the root path (`/my_data`). It behaves
+somewhat like a Python dictionary.
+data = live.get_data()
+all_data = data.get() #  this also works: data.get('/')
+sub_data = data.get('my/sub/path')
 ```
 
-To get notified if something changes within your Live Data connection, just connect
-to the database path using `blinker`.
+The push connection is established lazily, after the first call to `get_data`.
+
+To get notified if something changes within your LiveData connection, just connect
+to the signal at that database path.
 
 ```python
-import blinker
-
-
 def my_handler(data):
     print(data)
 
 
-# The signal name is the prefix (if specified), followed by a colon, and then the
-# dot-separated path to the data. If no prefix is specified, the colon is omitted.
-signal_name = 'fb:my_db_path.some.key'
-blinker.signal(signal_name).connect(my_handler)
+# Note that the root path (`/my_data` in this case) is omitted from the signal name.
+
+live.signal('/some/key').connect(my_handler)
 ```
+
+You can also set data:
+
+```python
+live.set_data('my/sub/path', 'my_value')
+```
+
+`blinker` events will be dispatched whenever data is set, either locally, like the
+example above, or via server push events.

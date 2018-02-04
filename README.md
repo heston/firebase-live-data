@@ -39,7 +39,7 @@ live = LiveData(app, '/my_data')
 # at that path. Any updates under this path will trigger `blinker` events.
 #
 # `data` is a local (greedy) cache of the data at the root path (`/my_data`). It behaves
-somewhat like a Python dictionary.
+# somewhat like a Python dictionary.
 data = live.get_data()
 all_data = data.get() #  this also works: data.get('/')
 sub_data = data.get('my/sub/path')

@@ -11,28 +11,27 @@ logger = logging.getLogger(__name__)
 
 
 class LiveData(object):
-
     def __init__(self, pyrebase_app, root_path, ttl=None):
-        self.events = Namespace()
         self._app = pyrebase_app
-        self._db = self.app.database()
+        self._root_path = root_path
+        self._ttl = ttl
+        self._db = self._app.database()
         self._streams = {}
         self._gc_streams = queue.Queue()
         self._gc_thread = None
-        self._cache = {}
-        self._root_path = root_path
-        self._ttl = ttl
+        self._cache = None
+        self.events = Namespace()
+
 
     def get_data(self):
-        try:
-            return self._cache[self._root_path]
-        except KeyError:
+        if self._cache is None:
             # Fetch data now
-            value = db.child(self._root_path).get().val()
-            self._cache[self._root_path] = data.FirebaseData(value, ttl)
+            value = self._db.child(self._root_path).get().val()
+            self._cache = data.FirebaseData(value)
             # Listen for updates
             self.listen()
-            return self._cache[self._root_path]
+
+        return self._cache
 
     def set_data(self, path, data):
         path_list = data.get_path_list(path)

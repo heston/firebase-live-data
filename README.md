@@ -68,3 +68,17 @@ live.set_data('my/sub/path', 'my_value')
 
 `blinker` events will be dispatched whenever data is set, either locally, like the
 example above, or via server push events.
+
+## Developing
+
+1. Install the development requirements (preferably into a virtualenv):
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Run tests to ensure everything works:
+
+```bash
+py.test
+```

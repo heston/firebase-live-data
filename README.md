@@ -1,5 +1,7 @@
 # Firebase Live Data
 
+[![Build Status](https://travis-ci.org/heston/firebase-live-data.svg?branch=master)](https://travis-ci.org/heston/firebase-live-data)
+
 Utilities for storing, retrieving, and monitoring Firebase Realtime Database objects in
 Python.
 

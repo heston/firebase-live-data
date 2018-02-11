@@ -21,6 +21,32 @@ class Test_get_path_list:
         assert result == ['foo', 'bar']
 
 
+class Test_normalize_path:
+    def test_absolute(self):
+        initial = '/foo/bar/baz/'
+        expected = 'foo/bar/baz'
+        result = firebase_data.normalize_path(initial)
+        assert result == expected
+
+    def test_relative(self):
+        initial = 'foo/bar/baz'
+        expected = 'foo/bar/baz'
+        result = firebase_data.normalize_path(initial)
+        assert result == expected
+
+    def test_duplicate_separators(self):
+        initial = 'foo//bar/baz/'
+        expected = 'foo/bar/baz'
+        result = firebase_data.normalize_path(initial)
+        assert result == expected
+
+    def test_leading_duplicate_separators(self):
+        initial = '//foo/bar/baz/'
+        expected = 'foo/bar/baz'
+        result = firebase_data.normalize_path(initial)
+        assert result == expected
+
+
 class TestFirebaseData_set:
     def test_set_root(self):
         data = firebase_data.FirebaseData()
@@ -98,17 +124,15 @@ class TestFirebaseData_get:
         assert result == 1
 
 
-class TestFirebaseData_staleness:
-    def test_last_updated_at__set_on_init(self):
+class TestFirebaseData_last_updated_at:
+    def test_set_on_init(self):
         data = firebase_data.FirebaseData()
 
         assert isinstance(data.last_updated_at, datetime.datetime)
 
-    def test_last_updated_at__updated_after_update(self):
+    def test_updated_after_update(self):
+        old_time = datetime.datetime.utcnow()
         data = firebase_data.FirebaseData()
-        old_time = datetime.datetime.utcnow() - datetime.timedelta(hours=2)
-        data.last_updated_at = old_time
-
         data.set('foo', 'bar')
         assert data.last_updated_at > old_time
 

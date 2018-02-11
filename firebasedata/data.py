@@ -1,5 +1,6 @@
 import collections
 import datetime
+import os.path
 import logging
 
 logger = logging.getLogger(__name__)
@@ -13,6 +14,14 @@ def get_path_list(path):
         return []
 
     return path.split('/')
+
+
+def normalize_path(path):
+    return os.path.normpath(
+        '/'.join(
+            get_path_list(path)
+        )
+    )
 
 
 class FirebaseData(dict):

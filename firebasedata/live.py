@@ -33,13 +33,13 @@ class LiveData(object):
 
         return self._cache
 
-    def set_data(self, path, data):
+    def set_data(self, path, value):
         path_list = data.get_path_list(path)
         child = self._db.child(self._root_path)
 
         for path_part in path_list:
             child = child.child(path_part)
-        child.set(data)
+        child.set(value)
 
     def is_stale(self):
         if self._ttl is None:
@@ -68,7 +68,7 @@ class LiveData(object):
     def reset(self):
         logger.debug('Resetting all data')
         self.hangup(block=False)
-        self._cache.clear()
+        self._cache = None
 
     def hangup(self, block=True):
         logger.debug('Marking all streams for shut down')
@@ -92,8 +92,8 @@ class LiveData(object):
         logger.debug('PATCH: path=%s data=%s', path, all_values)
 
         for rel_path, value in all_values.items():
-            full_path = '{}/{}'.format(path, rel_path)
-            self._set_path_value(path, value)
+            full_path = data.normalize_path('{}/{}'.format(path, rel_path))
+            self._set_path_value(full_path, value)
 
     def _stream_handler(self, message):
         logger.debug('STREAM received: %s', message)

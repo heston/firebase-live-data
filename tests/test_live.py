@@ -6,6 +6,19 @@ import pytest
 from firebasedata import data, live
 
 
+@pytest.fixture
+def livedata(mocker):
+    app = mocker.Mock()
+    root = '/'
+    ttl = datetime.timedelta(hours=1)
+    return live.LiveData(app, root, ttl)
+
+
+@pytest.fixture
+def logger(mocker):
+    return mocker.patch('firebasedata.live.logger')
+
+
 class Test_init:
     def test_no_ttl(self, mocker):
         app = mocker.Mock()
@@ -27,14 +40,6 @@ class Test_init:
         livedata = live.LiveData(app, root, ttl)
 
         assert livedata._ttl is ttl
-
-
-@pytest.fixture
-def livedata(mocker):
-    app = mocker.Mock()
-    root = '/'
-    ttl = datetime.timedelta(hours=1)
-    return live.LiveData(app, root, ttl)
 
 
 class Test_get_data:
@@ -300,3 +305,92 @@ class Test_patch_handler:
             mocker.call('foo/bar', value1),
             mocker.call('foo/baz', value2)
         ])
+
+
+class Test_valid_message:
+    def test_missing_event(self, livedata):
+        message = {
+            'path': '/',
+            'data': 'foo',
+        }
+        result = livedata._valid_message(message)
+        assert result is False
+
+    def test_missing_path(self, livedata):
+        message = {
+            'event': 'put',
+            'data': 'foo',
+        }
+        result = livedata._valid_message(message)
+        assert result is False
+
+    def test_missing_data(self, livedata):
+        message = {
+            'event': 'put',
+            'path': '/',
+        }
+        result = livedata._valid_message(message)
+        assert result is False
+
+    def test_invalid_event(self, livedata):
+        message = {
+            'event': 'get',
+            'path': '/',
+            'data': 'foo',
+        }
+        result = livedata._valid_message(message)
+        assert result is False
+
+    def test_is_valid(self, livedata):
+        message = {
+            'event': 'put',
+            'path': '/',
+            'data': 'foo',
+        }
+        result = livedata._valid_message(message)
+        assert result is True
+
+
+class Test_stream_handler:
+    def test_invalid_message(self, livedata, logger):
+        message = {
+            'event': 'post',
+            'path': '/',
+            'data': 'foo',
+        }
+        livedata._stream_handler(message)
+
+        assert logger.warn.called
+
+    def test_put_handler(self, livedata, mocker):
+        put_handler = mocker.Mock()
+        livedata._handlers['put'] = put_handler
+        message = {
+            'event': 'put',
+            'path': '/',
+            'data': 'foo',
+        }
+        livedata._stream_handler(message)
+
+        put_handler.assert_called_with(message['path'], message['data'])
+
+    def test_patch_handler(self, livedata, mocker):
+        patch_handler = mocker.Mock()
+        livedata._handlers['patch'] = patch_handler
+        message = {
+            'event': 'patch',
+            'path': '/',
+            'data': [
+                {
+                    'path': 'foo',
+                    'data': 'bar',
+                },
+                {
+                    'path': 'baz',
+                    'data': 'qux',
+                }
+            ]
+        }
+        livedata._stream_handler(message)
+
+        patch_handler.assert_called_with(message['path'], message['data'])

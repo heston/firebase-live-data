@@ -22,6 +22,10 @@ class LiveData(object):
         self._cache = None
         self.events = Namespace()
 
+        self._handlers = {
+            'put': self._put_handler,
+            'patch': self._patch_handler,
+        }
 
     def get_data(self):
         if self._cache is None:
@@ -95,18 +99,30 @@ class LiveData(object):
             full_path = data.normalize_path('{}/{}'.format(path, rel_path))
             self._set_path_value(full_path, value)
 
+    def _valid_message(self, message):
+        required_keys = [
+            'event',
+            'path',
+            'data',
+        ]
+
+        valid_keys = all(k in message for k in required_keys)
+        if not valid_keys:
+            return False
+
+        if message['event'] not in self._handlers:
+            return False
+
+        return True
+
     def _stream_handler(self, message):
         logger.debug('STREAM received: %s', message)
-        handlers = {
-            'put': self._put_handler,
-            'patch': self._patch_handler,
-        }
-        handler = handlers.get(message['event'])
+        if not self._valid_message(message):
+            logger.warn('Invalid message: %s', message)
+            return
 
-        if handler:
-            handler(message['path'], message['data'])
-        else:
-            logger.warn('No handler configured for message: %s', message)
+        handler = self._handlers[message['event']]
+        handler(message['path'], message['data'])
 
     def _gc_stream_worker(self):
         while True:

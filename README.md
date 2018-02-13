@@ -71,6 +71,10 @@ live.set_data('my/sub/path', 'my_value')
 `blinker` events will be dispatched whenever data is set, either locally, like the
 example above, or via server push events.
 
+## Compatibility
+
+Firebase Live Data is tested against Python 3.6. It may work with other versions of Python 3, but these have not been tested. It is not compatible with Python 2.
+
 ## Developing
 
 1. Install the development requirements (preferably into a virtualenv):

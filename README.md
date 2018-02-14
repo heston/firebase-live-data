@@ -1,6 +1,7 @@
 # Firebase Live Data
 
 [![Build Status](https://travis-ci.org/heston/firebase-live-data.svg?branch=master)](https://travis-ci.org/heston/firebase-live-data)
+[![Coverage Status](https://coveralls.io/repos/github/heston/firebase-live-data/badge.svg?branch=master)](https://coveralls.io/github/heston/firebase-live-data?branch=master)
 
 Utilities for storing, retrieving, and monitoring Firebase Realtime Database objects in
 Python.

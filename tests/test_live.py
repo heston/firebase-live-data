@@ -394,3 +394,28 @@ class Test_stream_handler:
         livedata._stream_handler(message)
 
         patch_handler.assert_called_with(message['path'], message['data'])
+
+
+class Test_stream_gc:
+    def test_close_normal_stream(self, livedata, mocker, logger):
+        stream = mocker.Mock()
+
+        livedata._start_stream_gc()
+        livedata._streams[id(stream)] = stream
+        livedata._gc_streams.put(stream)
+        livedata._gc_streams.join()
+
+        assert stream.close.called
+        logger.debug.assert_any_call('Closing stream: %s', stream)
+        logger.debug.assert_any_call('Stream closed: %s', stream)
+
+    def test_close_orphan_stream(self, livedata, mocker, logger):
+        stream = mocker.Mock()
+
+        livedata._start_stream_gc()
+        livedata._gc_streams.put(stream)
+        livedata._gc_streams.join()
+
+        assert stream.close.called
+        logger.debug.assert_any_call('Closing stream: %s', stream)
+        logger.warning.assert_any_call('Error closing stream %s: %s', stream, mocker.ANY)

@@ -128,15 +128,16 @@ class LiveData(object):
         while True:
             stream = self._gc_streams.get()
             logger.debug('Closing stream: %s', stream)
-            stream.close()
-            self._gc_streams.task_done()
 
             try:
+                stream.close()
                 del self._streams[id(stream)]
-            except:
-                pass
+            except Exception as e:
+                logger.warning('Error closing stream %s: %s', stream, e)
+            else:
+                logger.debug('Stream closed: %s', stream)
 
-            logger.debug('Stream closed: %s', stream)
+            self._gc_streams.task_done()
 
     def _start_stream_gc(self):
         if self._gc_thread is None:

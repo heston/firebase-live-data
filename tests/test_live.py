@@ -284,10 +284,8 @@ class Test_patch_handler:
             path2: value2,
         })
 
-        livedata._set_path_value.assert_has_calls([
-            mocker.call('foo/bar', value1),
-            mocker.call('foo/baz', value2)
-        ])
+        livedata._set_path_value.assert_any_call('foo/bar', value1)
+        livedata._set_path_value.assert_any_call('foo/baz', value2)
 
     def test_relative_paths(self, livedata, mocker):
         livedata._set_path_value = mocker.Mock()

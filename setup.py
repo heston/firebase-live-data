@@ -1,4 +1,10 @@
+from os import path
 from setuptools import setup, find_packages
+
+base_dir = path.abspath(path.dirname(__file__))
+
+with open(path.join(base_dir, 'README.rst'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
     name='FirebaseData',
@@ -12,5 +18,6 @@ setup(
     author='Heston Liebowitz',
     author_email='me@hestonliebowitz.com',
     description='Utilities for storing, retrieving, and monitoring Firebase Realtime Database objects in Python.',
+    long_description=long_description,
     license='MIT'
 )

@@ -81,12 +81,12 @@ other versions of Python 3, and it is known to be incompatible with Python 2.
 
 1. Install the development requirements (preferably into a virtualenv):
 
-  ```bash
-  pip install -r requirements.txt
-  ```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 2. Run tests to ensure everything works:
 
-  ```bash
-  py.test
-  ```
+    ```bash
+    py.test
+    ```

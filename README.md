@@ -74,8 +74,8 @@ example above, or via server push events.
 
 ## Compatibility
 
-Firebase Live Data is tested against Python 3.5 and 3.6. It has not been tested against
-other versions of Python 3, and it is known to be incompatible with Python 2.
+Firebase Live Data is tested against Python 3.4, 3.5, and 3.6. It is not compatible with
+Python 2.
 
 ## Developing
 

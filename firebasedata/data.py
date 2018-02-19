@@ -32,7 +32,16 @@ class FirebaseData(dict):
 
     def __init__(self, *args, **kwargs):
         self._set_last_updated()
-        super().__init__(*args, **kwargs)
+
+        try:
+            super().__init__(*args, **kwargs)
+        except (TypeError, ValueError):
+            if len(args) == 1:
+                super().__init__()
+                initial = args[0]
+                self._default_value = initial
+            else:
+                raise
 
     def get_node_for_path(self, path):
         keys = get_path_list(path)
@@ -69,36 +78,58 @@ class FirebaseData(dict):
             key=key
         )
 
+    def _update(self, node, value):
+        try:
+            node.update(value)
+            try:
+                del self._default_value
+            except AttributeError:
+                pass
+        except (TypeError, ValueError):
+            self._default_value = value
+
     def set(self, path, value):
         node = self.get_node_for_path(path)
+
         if not node.key:
             if value is None:
                 node.value.clear()
             else:
-                node.value.update(value)
+                self._update(node.value, value)
         else:
             if value is None:
                 del node.parent[node.key]
             else:
-                node.parent[node.key] = value
+                self._update(node.parent, {node.key: value})
 
         self._set_last_updated()
 
     def get(self, path='/'):
         parts = get_path_list(path)
         node = self
+
         for part in parts:
             try:
                 node = node[part]
             except (KeyError, TypeError):
                 return None
-        return node
+
+        try:
+            return node._default_value
+        except AttributeError:
+            return node
 
     def __repr__(self):
         tmpl = '{cls}(id={id}, last_updated_at={ts}, data={data})'
+
+        try:
+            data = self._default_value
+        except AttributeError:
+            data = super().__repr__()
+
         return tmpl.format(
             cls=type(self).__name__,
             id=id(self),
             ts=self.last_updated_at,
-            data=super().__repr__(),
+            data=data,
         )

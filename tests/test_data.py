@@ -152,3 +152,44 @@ def test_FirebaseData_repr():
         ')'.format(data_id)
     )
 
+
+class TestFirebaseData_single_value:
+    def test_set_none_initially(self):
+        data = firebase_data.FirebaseData(None)
+        result = data.get()
+
+        assert result is None
+
+    def test_set_str_initially(self):
+        data = firebase_data.FirebaseData('hello')
+        result = data.get()
+
+        assert result == 'hello'
+
+    def test_set_none_initally_update_string(self):
+        data = firebase_data.FirebaseData(None)
+        data.set('/', 'hello')
+        result = data.get()
+
+        assert result == 'hello'
+
+    def test_set_none_initally_update_with_dict(self):
+        data = firebase_data.FirebaseData(None)
+        data.set('/', {'foo': 1})
+        result = data.get()
+
+        assert result == {'foo': 1}
+
+    def test_set_none_initally_update_subpath_with_dict_then_get(self):
+        data = firebase_data.FirebaseData(None)
+        data.set('/foo/bar', 1)
+        result = data.get()
+
+        assert result == {'foo': {'bar': 1}}
+
+    def test_set_none_initally_update_subpath_with_dict_then_get_path(self):
+        data = firebase_data.FirebaseData(None)
+        data.set('/foo/bar', 1)
+        result = data.get('/foo/bar')
+
+        assert result == 1

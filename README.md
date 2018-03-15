@@ -54,14 +54,17 @@ To get notified if something changes within your LiveData connection, just conne
 to the signal at that database path.
 
 ```python
-def my_handler(data):
-    print(data)
+def my_handler(sender, value=None):
+    print(value)
 
 
 # Note that the root path (`/my_data` in this case) is omitted from the signal name.
 
 live.signal('/some/key').connect(my_handler)
 ```
+
+`my_handler` will be invoked with `sender` set to the `FirebaseData` instance, and the
+`value` keyword argument set to the value of the key that changed.
 
 You can also set data:
 

@@ -6,6 +6,7 @@ import threading
 from blinker.base import Namespace
 
 from . import data
+from . import watcher
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +69,16 @@ class LiveData(object):
         stream = self._db.child(self._root_path).stream(self._stream_handler)
         self._streams[id(stream)] = stream
         self._start_stream_gc()
+        watcher.watch(
+            id(self),
+            self.is_stale,
+            self.restart,
+            interval=self._ttl
+        )
+
+    def restart(self):
+        self.reset()
+        self.get_data()
 
     def reset(self):
         logger.debug('Resetting all data')

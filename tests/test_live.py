@@ -165,6 +165,18 @@ class Test_listen:
         assert stream_id in livedata._streams
         assert livedata._streams[stream_id] is stream
 
+    def test_watcher_is_started(self, livedata, mocker):
+        watch_mock = mocker.patch('firebasedata.watcher.watch')
+
+        livedata.listen()
+
+        watch_mock.assert_called_with(
+            id(livedata),
+            livedata.is_stale,
+            livedata.restart,
+            interval=livedata._ttl
+        )
+
     def test_stream_gc_is_started(self, livedata, mocker):
         livedata._start_stream_gc = mocker.Mock()
         livedata.listen()
@@ -184,6 +196,20 @@ class Test_reset:
         livedata.reset()
 
         assert livedata._cache is None
+
+
+class Test_restart:
+    def test_calls_reset(self, livedata, mocker):
+        livedata.reset = mocker.Mock()
+        livedata.restart()
+
+        assert livedata.reset.called
+
+    def test_resets_get_data(self, livedata, mocker):
+        livedata.get_data = mocker.Mock()
+        livedata.restart()
+
+        assert livedata.get_data.called
 
 
 class Test_hangup:

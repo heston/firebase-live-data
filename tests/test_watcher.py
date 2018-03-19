@@ -38,6 +38,16 @@ def test_Watcher_start(watcher_stub, timer_fake):
     assert timer_fake.return_value.start.called
 
 
+def test_Watcher_cannot_start_while_running(watcher_stub, log_mock):
+    watcher_stub.start()
+    watcher_stub.start()
+
+    log_mock.debug.assert_called_with(
+        'Watcher already running: %s',
+        id(watcher_stub)
+    )
+
+
 def test_Watcher_cancel(watcher_stub):
     watcher_stub.cancel()
 

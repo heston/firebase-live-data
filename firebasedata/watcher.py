@@ -41,6 +41,7 @@ class Watcher:
             id(self),
             self._should_update
         )
+
         if self._should_update():
             logger.debug(
                 'Update requested. Watcher (%s) updating: %s',
@@ -48,6 +49,7 @@ class Watcher:
                 self._update_func
             )
             self._update_func()
+
         # Mark this timer as complete, and start a new timer
         self.running = False
         self.start()
@@ -60,15 +62,21 @@ def watch(name, should_update, update_func, interval=None):
     """Watch something and call a function when it should be updated.
 
     Arguments:
+        name: A unique identifier for this watcher. May be any hashable value.
         should_update: Callable that returns True if the thing being watched
             should be updated, or False otherwise.
         update_func: Callable that updates the thing being watched when {should_update}
             returns True. Watching and updating occurs in a separate thread,
             so ensure this function is threadsafe.
         interval: datetime.timedelta indicating how often to poll {should_update}.
-
-    Returns: A callable that will stop all watchers.
     """
+    if name in _watchers:
+        logger.warning(
+            'Cannot start watcher. Watcher already running: %s',
+            _watchers[name]
+        )
+        return
+
     watcher = Watcher(should_update, update_func, interval)
     _watchers[name] = watcher
     watcher.start()

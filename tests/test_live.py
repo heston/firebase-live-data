@@ -213,6 +213,13 @@ class Test_restart:
 
 
 class Test_hangup:
+    def test_cancel_watcher(self, livedata, mocker):
+        watcher_mock = mocker.patch('firebasedata.live.watcher')
+
+        livedata.hangup()
+
+        watcher_mock.cancel.assert_called_with(id(livedata))
+
     def test_no_streams_gc(self, livedata, mocker):
         gc_streams = mocker.Mock()
         livedata._gc_streams = gc_streams

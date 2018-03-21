@@ -72,6 +72,7 @@ def test_Watcher_action__not_stale(mocker, watcher_stub):
 
     assert watcher_stub._should_update.called
     assert not watcher_stub._update_func.called
+    assert watcher_stub.running is False
     assert watcher_stub.start.called
 
 
@@ -83,6 +84,7 @@ def test_Watcher_action__stale(mocker, watcher_stub):
 
     assert watcher_stub._should_update.called
     assert watcher_stub._update_func.called
+    assert watcher_stub.running is False
     assert watcher_stub.start.called
 
 
@@ -93,20 +95,41 @@ def test_Watcher_action__should_cancel(mocker, watcher_stub):
 
     assert not watcher_stub._should_update.called
     assert not watcher_stub._update_func.called
+    assert watcher_stub.running is False
     assert not watcher_stub.start.called
 
 
-def test_watch(mocker):
+def test_watch__unknown_name(mocker):
     watcher_stub = mocker.patch('firebasedata.watcher.Watcher')
     is_stale = mocker.Mock()
     update = mocker.Mock()
     interval = timedelta(seconds=.001)
 
+    # Reset watchers
+    watcher.cancel_all()
     watcher.watch('test_watcher', is_stale, update, interval)
 
     watcher_stub.assert_called_with(is_stale, update, interval)
     assert watcher_stub.return_value.start.called
     assert 'test_watcher' in watcher._watchers
+
+
+def test_watch__existing_name(mocker, log_mock):
+    watcher_stub = mocker.patch('firebasedata.watcher.Watcher')
+    is_stale = mocker.Mock()
+    update = mocker.Mock()
+    interval = timedelta(seconds=.001)
+
+    # Reset watchers
+    watcher.cancel_all()
+    watcher.watch('test_watcher', is_stale, update, interval)
+    watcher.watch('test_watcher', is_stale, update, interval)
+
+    assert watcher_stub.call_count == 1
+    log_mock.warning.assert_called_with(
+        'Cannot start watcher. Watcher already running: %s',
+        watcher_stub.return_value
+    )
 
 
 def test_cancel__unknown_name(mocker):

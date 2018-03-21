@@ -88,6 +88,8 @@ class LiveData(object):
     def hangup(self, block=True):
         logger.debug('Marking all streams for shut down')
 
+        watcher.cancel(id(self))
+
         for stream in self._streams.values():
             self._gc_streams.put(stream)
 

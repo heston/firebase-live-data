@@ -1,5 +1,7 @@
 import datetime
 
+import pytest
+
 from firebasedata import data as firebase_data
 
 
@@ -45,6 +47,28 @@ class Test_normalize_path:
         expected = 'foo/bar/baz'
         result = firebase_data.normalize_path(initial)
         assert result == expected
+
+
+class TestFirebaseData_init:
+    def test_empty(self):
+        data = firebase_data.FirebaseData()
+        assert data == {}
+
+    def test_dict(self):
+        data = firebase_data.FirebaseData({'a': 1})
+        assert data == {'a': 1}
+
+    def test_keys(self):
+        data = firebase_data.FirebaseData(a=1)
+        assert data == {'a': 1}
+
+    def test_single_value(self):
+        data = firebase_data.FirebaseData('a')
+        assert data == {}
+
+    def test_invalid_args(self):
+        with pytest.raises(TypeError):
+            firebase_data.FirebaseData('a', 'b')
 
 
 class TestFirebaseData_set:

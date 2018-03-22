@@ -8,7 +8,7 @@ with open(path.join(base_dir, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='FirebaseData',
-    version='0.3',
+    version='0.4',
     packages=find_packages(),
     install_requires=[
         'blinker>=1.4',

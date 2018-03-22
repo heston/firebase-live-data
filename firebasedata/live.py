@@ -51,8 +51,8 @@ class LiveData(object):
             return False
 
         data = self.get_data()
-        if not data or not data.last_updated_at:
-            logger.debug('Data is stale: %s', data)
+        if data is None or data.last_updated_at is None:
+            logger.debug('Data is invalid: %s', data)
             return True
 
         stale = datetime.datetime.utcnow() - data.last_updated_at > self._ttl

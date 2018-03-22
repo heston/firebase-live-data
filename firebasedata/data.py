@@ -27,9 +27,6 @@ def normalize_path(path):
 class FirebaseData(dict):
     last_updated_at = None
 
-    def _set_last_updated(self):
-        self.last_updated_at = datetime.datetime.utcnow()
-
     def __init__(self, *args, **kwargs):
         self._set_last_updated()
 
@@ -42,6 +39,9 @@ class FirebaseData(dict):
                 self._default_value = initial
             else:
                 raise
+
+    def _set_last_updated(self):
+        self.last_updated_at = datetime.datetime.utcnow()
 
     def get_node_for_path(self, path):
         keys = get_path_list(path)

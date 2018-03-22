@@ -100,6 +100,20 @@ class Test_is_stale:
 
         assert result is True
 
+    def test_empty_data(self, livedata, mocker):
+        livedata.get_data = mocker.Mock(return_value=data.FirebaseData())
+
+        result = livedata.is_stale()
+
+        assert result is False
+
+    def test_no_default_data(self, livedata, mocker):
+        livedata.get_data = mocker.Mock(return_value=data.FirebaseData(None))
+
+        result = livedata.is_stale()
+
+        assert result is False
+
     def test_missing_data_last_updated_at(self, livedata, mocker):
         livedata.get_data = mocker.Mock(**{'return_value.last_updated_at': None})
 

@@ -21,6 +21,27 @@ Firebase `PUT` and `PATCH` events?)
 
 Firebase Live Data abstracts these concepts into simple `blinker` signals that are easy to use.
 
+## Installing
+
+```shell
+pip install FirebaseData Pyrebase
+```
+
+The Python Tutorial has more details about this command and [virtual environments](https://docs.python.org/3/tutorial/venv.html).
+
+## Dependencies
+
+Firebase Live Data has a direct dependency on
+[Blinker](https://pypi.python.org/pypi/blinker), and a peer dependency on
+[Pyrebase](https://pypi.python.org/pypi/Pyrebase). This means that Blinker will be
+installed automatically, while Pyrebase must be installed separately (hence its inclusion
+in the `pip` command above). This is because Pyrebase requires [additional configuration](https://github.com/thisbejim/Pyrebase#add-pyrebase-to-your-application)
+that is outside the scope of this document.
+
+## Compatibility
+
+Firebase Live Data is tested against Python 3.4, 3.5, and 3.6. It is not compatible with
+Python 2.
 
 ## Usage
 
@@ -74,11 +95,6 @@ live.set_data('my/sub/path', 'my_value')
 
 `blinker` events will be dispatched whenever data is set, either locally, like the
 example above, or via server push events.
-
-## Compatibility
-
-Firebase Live Data is tested against Python 3.4, 3.5, and 3.6. It is not compatible with
-Python 2.
 
 ## Developing
 

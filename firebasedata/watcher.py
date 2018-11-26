@@ -78,6 +78,7 @@ def watch(name, should_update, update_func, interval=None):
         return
 
     watcher = Watcher(should_update, update_func, interval)
+    logger.debug('New watcher started %s: %s', name, id(watcher))
     _watchers[name] = watcher
     watcher.start()
 
@@ -87,7 +88,7 @@ def cancel(name):
         return None
     watcher = _watchers[name]
     if watcher:
-        logger.debug('Cancelling watcher: %s (%s)', name, id(watcher))
+        logger.debug('Cancelling watcher %s: %s', name, id(watcher))
         watcher.cancel()
     del _watchers[name]
     return True

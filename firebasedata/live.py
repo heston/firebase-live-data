@@ -62,8 +62,9 @@ class LiveData(object):
             logger.debug('Data is fresh: %s', data)
         return stale
 
-    def signal(self, *args, **kwargs):
-        return self.events.signal(*args, **kwargs)
+    def signal(self, path, doc=None):
+        norm_path = data.normalize_path(path)
+        return self.events.signal(norm_path, doc=doc)
 
     def listen(self):
         stream = self._db.child(self._root_path).stream(self._stream_handler)

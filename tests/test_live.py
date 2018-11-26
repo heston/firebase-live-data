@@ -157,6 +157,11 @@ class Test_signal:
         signal2 = livedata.signal('/foo/bar')
         assert signal1 is signal2
 
+    def test_normalized_signal(self, livedata):
+        signal1 = livedata.signal('/foo/bar/')
+        signal2 = livedata.signal('foo/bar')
+        assert signal1 is signal2
+
     def test_new_signal(self, livedata):
         signal1 = livedata.signal('/foo/bar')
         signal2 = livedata.signal('/foo/bar/baz')

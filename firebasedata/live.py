@@ -107,10 +107,14 @@ class LiveData(object):
         partial_path = ''
         value = self.get_data()
 
-        self.events.signal('/').send(value, value=value.get())
+        self.events.signal('/').send(value, value=value.get(), path=path)
         for part in path_list:
-            partial_path = '/'.join((partial_path, part))
-            self.events.signal(partial_path).send(value, value=value.get(partial_path))
+            partial_path = data.normalize_path('/'.join((partial_path, part)))
+            self.events.signal(partial_path).send(
+                value,
+                value=value.get(partial_path),
+                path=path
+            )
 
     def _put_handler(self, path, value):
         logger.debug('PUT: path=%s data=%s', path, value)

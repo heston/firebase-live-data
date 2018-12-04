@@ -24,6 +24,12 @@ class Test_get_path_list:
 
 
 class Test_normalize_path:
+    def test_root(self):
+        initial = '/'
+        expected = '.'
+        result = firebase_data.normalize_path(initial)
+        assert result == expected
+
     def test_absolute(self):
         initial = '/foo/bar/baz/'
         expected = 'foo/bar/baz'

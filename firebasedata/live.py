@@ -116,7 +116,6 @@ class LiveData(object):
                 path=path
             )
 
-
     def _put_handler(self, path, value):
         logger.debug('PUT: path=%s data=%s', path, value)
         self._set_path_value(path, value)

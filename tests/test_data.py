@@ -141,12 +141,12 @@ class TestFirebaseData_get:
     def test_get_missing_key(self):
         data = firebase_data.FirebaseData()
         result = data.get('/foo/bar')
-        assert result == None
+        assert result is None
 
     def test_get_different_type_key(self):
         data = firebase_data.FirebaseData({'foo': 1})
         result = data.get('/foo/bar')
-        assert result == None
+        assert result is None
 
     def test_existing_key(self):
         data = firebase_data.FirebaseData({'foo': {'bar': 1}})
@@ -176,7 +176,7 @@ def test_FirebaseData_repr():
     result = str(data)
     assert result == (
         'FirebaseData('
-            'id={}, '
+            'id={}, '  # noqa
             'last_updated_at=2017-09-02 20:02:59, '
             'data={{\'a\': 1}}'
         ')'.format(data_id)

@@ -31,7 +31,6 @@ class Test_init:
         assert livedata._db is app.database.return_value
         assert livedata._ttl is None
 
-
     def test_with_ttl(self, mocker):
         app = mocker.Mock()
         root = '/'
@@ -173,7 +172,9 @@ class Test_listen:
         livedata.listen()
 
         livedata._db.child.assert_called_with(livedata._root_path)
-        livedata._db.child.return_value.stream.assert_called_with(livedata._stream_handler)
+        livedata._db.child.return_value.stream.assert_called_with(
+            livedata._stream_handler
+        )
 
     def test_stream_is_tracked(self, livedata):
         livedata.listen()

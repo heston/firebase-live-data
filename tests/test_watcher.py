@@ -13,7 +13,7 @@ def log_mock(mocker):
 
 @pytest.fixture
 def timer_fake(mocker):
-    return  mocker.patch('firebasedata.watcher.Timer')
+    return mocker.patch('firebasedata.watcher.Timer')
 
 
 @pytest.fixture

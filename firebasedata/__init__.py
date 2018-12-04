@@ -1,2 +1,2 @@
-from .data import FirebaseData
-from .live import LiveData
+from .data import FirebaseData  # noqa
+from .live import LiveData  # noqa

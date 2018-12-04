@@ -317,7 +317,7 @@ class Test_recurse_signal:
         livedata._recurse_signal('/')
 
         livedata.get_data.return_value.get.assert_called_with()
-        livedata.events.signal.assert_called_with('/')
+        livedata.events.signal.assert_called_with('.', doc=None)
         livedata.events.signal.return_value.send.assert_called_with(
             livedata.get_data.return_value,
             value=livedata.get_data.return_value.get.return_value,
@@ -331,7 +331,7 @@ class Test_recurse_signal:
         livedata._recurse_signal('/foo')
 
         livedata.get_data.return_value.get.assert_any_call()
-        livedata.events.signal.assert_any_call('/')
+        livedata.events.signal.assert_any_call('.', doc=None)
 
     def test_child_sends_child(self, livedata, mocker):
         livedata.get_data = mocker.Mock()
@@ -339,8 +339,8 @@ class Test_recurse_signal:
 
         livedata._recurse_signal('/foo')
 
-        livedata.get_data.return_value.get.assert_any_call('foo')
-        livedata.events.signal.assert_any_call('foo')
+        livedata.get_data.return_value.get.assert_any_call('/foo')
+        livedata.events.signal.assert_any_call('foo', doc=None)
 
     def test_nested_sends_parent(self, livedata, mocker):
         livedata.get_data = mocker.Mock()
@@ -348,8 +348,8 @@ class Test_recurse_signal:
 
         livedata._recurse_signal('/foo/bar')
 
-        livedata.get_data.return_value.get.assert_any_call('foo')
-        livedata.events.signal.assert_any_call('foo')
+        livedata.get_data.return_value.get.assert_any_call('/foo')
+        livedata.events.signal.assert_any_call('foo', doc=None)
 
     def test_nested_sends_child(self, livedata, mocker):
         livedata.get_data = mocker.Mock()
@@ -357,8 +357,8 @@ class Test_recurse_signal:
 
         livedata._recurse_signal('/foo/bar')
 
-        livedata.get_data.return_value.get.assert_any_call('foo/bar')
-        livedata.events.signal.assert_any_call('foo/bar')
+        livedata.get_data.return_value.get.assert_any_call('/foo/bar')
+        livedata.events.signal.assert_any_call('foo/bar', doc=None)
         livedata.events.signal.return_value.send.assert_called_with(
             livedata.get_data.return_value,
             value=livedata.get_data.return_value.get.return_value,

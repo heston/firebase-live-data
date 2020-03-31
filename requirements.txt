@@ -1,6 +1,7 @@
 argh==0.26.2
 attrs==17.4.0
 blinker==1.4
+callee==0.3.1
 certifi==2018.1.18
 chardet==3.0.4
 colorama==0.3.9
@@ -10,6 +11,7 @@ flake8==3.6.0
 idna==2.6
 mccabe==0.6.1
 pathtools==0.1.2
+pkg-resources==0.0.0
 pkginfo==1.4.1
 pluggy==0.6.0
 py==1.5.2

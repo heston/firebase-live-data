@@ -1,6 +1,7 @@
 import datetime
 
 import blinker.base
+import callee
 import pytest
 
 from firebasedata import data, live
@@ -203,6 +204,12 @@ class Test_listen:
 
         assert livedata._start_stream_gc.called
 
+    def test_metawatcher_is_canceled(self, livedata, mocker):
+        livedata.cancel_metawatcher = mocker.Mock()
+        livedata.listen()
+
+        assert livedata.cancel_metawatcher.called
+
 
 class Test_reset:
     def test_calls_hangup(self, livedata, mocker):
@@ -226,11 +233,45 @@ class Test_restart:
         assert livedata.reset.called
 
     def test_resets_get_data(self, livedata, mocker):
-        livedata.get_data = mocker.Mock()
+        livedata.start_metawatcher = mocker.Mock()
         livedata.restart()
 
-        assert livedata.get_data.called
+        assert livedata.start_metawatcher.called
 
+    def test_watches_data(self, livedata, mocker):
+        watcher_mock = mocker.patch('firebasedata.live.watcher.watch')
+        livedata.restart()
+
+        watcher_mock.assert_called_with(
+            'meta_{}'.format(id(livedata)),
+            callee.functions.Callable(),
+            livedata.get_data,
+            interval=callee.types.InstanceOf(datetime.timedelta)
+        )
+
+class Test_metawatcher:
+    def test_get_metawatcher_name(self, livedata):
+        name = livedata.get_metawatcher_name()
+        assert 'meta_{}'.format(id(livedata)) == name
+
+    def test_start_metawatcher(self, livedata, mocker):
+        watcher_mock = mocker.patch('firebasedata.live.watcher.watch')
+        livedata.start_metawatcher()
+
+        watcher_mock.assert_called_with(
+            'meta_{}'.format(id(livedata)),
+            callee.functions.Callable(),
+            livedata.get_data,
+            interval=callee.types.InstanceOf(datetime.timedelta)
+        )
+
+    def test_cancel_metawatcher(self, livedata, mocker):
+        name = 'metawatcher'
+        watcher_mock = mocker.patch('firebasedata.live.watcher.cancel')
+        livedata.get_metawatcher_name = lambda: name
+        livedata.cancel_metawatcher()
+
+        watcher_mock.assert_called_with(name)
 
 class Test_hangup:
     def test_cancel_watcher(self, livedata, mocker):

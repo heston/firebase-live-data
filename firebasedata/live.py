@@ -76,10 +76,26 @@ class LiveData(object):
             self.restart,
             interval=self._ttl
         )
+        self.cancel_metawatcher()
+
+    def get_metawatcher_name(self):
+        return 'meta_{}'.format(id(self))
+
+    def start_metawatcher(self):
+        watcher.watch(
+            self.get_metawatcher_name(),
+            lambda: self._cache is None,
+            self.get_data,
+            interval=datetime.timedelta(minutes=1)
+        )
+
+    def cancel_metawatcher(self):
+        watcher.cancel(self.get_metawatcher_name())
 
     def restart(self):
         self.reset()
         self.get_data()
+        self.start_metawatcher()
 
     def reset(self):
         logger.debug('Resetting all data')

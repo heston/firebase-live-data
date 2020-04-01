@@ -10,14 +10,17 @@ from . import data
 from . import watcher
 
 logger = logging.getLogger(__name__)
+RETRY_INTERVAL = datetime.timedelta(minutes=1)
 
 
 class LiveData(object):
-    def __init__(self, pyrebase_app, root_path, ttl=None):
+    def __init__(self, pyrebase_app, root_path, ttl=None, retry_interval=None):
         self._app = pyrebase_app
         self._root_path = root_path
         self._ttl = ttl
-        self._retry_interval = datetime.timedelta(minutes=1)
+        self._retry_interval = (
+            RETRY_INTERVAL if retry_interval is None else retry_interval
+        )
         self._db = self._app.database()
         self._streams = {}
         self._gc_streams = queue.Queue()

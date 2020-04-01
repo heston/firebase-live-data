@@ -146,7 +146,7 @@ def test_connection_recovery(livedata, mocker):
     time.sleep(3)
 
     watch_mock.assert_any_call(
-        'meta_{}'.format(id(livedata)),
+        livedata.get_metawatcher_name(),
         callee.functions.Callable(),
         livedata.get_data,
         interval=livedata._retry_interval

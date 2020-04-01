@@ -36,7 +36,7 @@ class LiveData(object):
             try:
                 value = self._db.child(self._root_path).get().val()
             except HTTPError as e:
-                logger.error('Error getting data: %s', e)
+                logger.exception('Error getting data')
             else:
                 self._cache = data.FirebaseData(value)
                 # Listen for updates
@@ -76,7 +76,7 @@ class LiveData(object):
         try:
             stream = self._db.child(self._root_path).stream(self._stream_handler)
         except HTTPError as e:
-            logger.error('Error starting stream: %s', e)
+            logger.exception('Error starting stream')
         else:
             self._streams[id(stream)] = stream
             self._start_stream_gc()

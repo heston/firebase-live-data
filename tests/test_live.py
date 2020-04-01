@@ -70,7 +70,7 @@ class Test_get_data:
         result = livedata.get_data()
 
         assert result is None
-        assert logger.error.called
+        assert logger.exception.called
 
 
 class Test_set_data:
@@ -226,7 +226,7 @@ class Test_listen:
 
         livedata.listen()
 
-        assert logger.error.called
+        assert logger.exception.called
 
 
 class Test_reset:

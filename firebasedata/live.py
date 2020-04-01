@@ -4,6 +4,7 @@ import queue
 import threading
 
 from blinker.base import Namespace
+from urllib3.exceptions import HTTPError
 
 from . import data
 from . import watcher
@@ -16,6 +17,7 @@ class LiveData(object):
         self._app = pyrebase_app
         self._root_path = root_path
         self._ttl = ttl
+        self._retry_interval = datetime.timedelta(minutes=1)
         self._db = self._app.database()
         self._streams = {}
         self._gc_streams = queue.Queue()
@@ -31,10 +33,14 @@ class LiveData(object):
     def get_data(self):
         if self._cache is None:
             # Fetch data now
-            value = self._db.child(self._root_path).get().val()
-            self._cache = data.FirebaseData(value)
-            # Listen for updates
-            self.listen()
+            try:
+                value = self._db.child(self._root_path).get().val()
+            except HTTPError as e:
+                logger.error('Error getting data: %s', e)
+            else:
+                self._cache = data.FirebaseData(value)
+                # Listen for updates
+                self.listen()
 
         return self._cache
 
@@ -67,16 +73,20 @@ class LiveData(object):
         return self.events.signal(norm_path, doc=doc)
 
     def listen(self):
-        stream = self._db.child(self._root_path).stream(self._stream_handler)
-        self._streams[id(stream)] = stream
-        self._start_stream_gc()
-        watcher.watch(
-            id(self),
-            self.is_stale,
-            self.restart,
-            interval=self._ttl
-        )
-        self.cancel_metawatcher()
+        try:
+            stream = self._db.child(self._root_path).stream(self._stream_handler)
+        except HTTPError as e:
+            logger.error('Error starting stream: %s', e)
+        else:
+            self._streams[id(stream)] = stream
+            self._start_stream_gc()
+            watcher.watch(
+                id(self),
+                self.is_stale,
+                self.restart,
+                interval=self._ttl
+            )
+            self.cancel_metawatcher()
 
     def get_metawatcher_name(self):
         return 'meta_{}'.format(id(self))
@@ -86,7 +96,7 @@ class LiveData(object):
             self.get_metawatcher_name(),
             lambda: self._cache is None,
             self.get_data,
-            interval=datetime.timedelta(minutes=1)
+            interval=self._retry_interval
         )
 
     def cancel_metawatcher(self):
@@ -94,8 +104,8 @@ class LiveData(object):
 
     def restart(self):
         self.reset()
-        self.get_data()
         self.start_metawatcher()
+        self.get_data()
 
     def reset(self):
         logger.debug('Resetting all data')

@@ -249,6 +249,7 @@ class Test_restart:
             interval=callee.types.InstanceOf(datetime.timedelta)
         )
 
+
 class Test_metawatcher:
     def test_get_metawatcher_name(self, livedata):
         name = livedata.get_metawatcher_name()
@@ -272,6 +273,7 @@ class Test_metawatcher:
         livedata.cancel_metawatcher()
 
         watcher_mock.assert_called_with(name)
+
 
 class Test_hangup:
     def test_cancel_watcher(self, livedata, mocker):

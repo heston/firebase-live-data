@@ -142,7 +142,7 @@ def test_connection_recovery(livedata, mocker):
     livedata.is_stale = lambda: True
     livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
 
-    result = livedata.restart()
+    livedata.restart()
     time.sleep(3)
 
     watch_mock.assert_any_call(

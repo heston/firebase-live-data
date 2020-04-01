@@ -242,7 +242,7 @@ class Test_restart:
         watcher_mock = mocker.patch('firebasedata.live.watcher.watch')
         livedata.restart()
 
-        watcher_mock.assert_called_with(
+        watcher_mock.assert_any_call(
             'meta_{}'.format(id(livedata)),
             callee.functions.Callable(),
             livedata.get_data,

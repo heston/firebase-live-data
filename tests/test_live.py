@@ -246,26 +246,24 @@ class Test_reset:
 class Test_restart:
     def test_calls_reset(self, livedata, mocker):
         livedata.reset = mocker.Mock()
+
         livedata.restart()
 
         assert livedata.reset.called
 
-    def test_resets_get_data(self, livedata, mocker):
+    def test_calls_start_metawatcher(self, livedata, mocker):
         livedata.start_metawatcher = mocker.Mock()
+
         livedata.restart()
 
         assert livedata.start_metawatcher.called
 
-    def test_watches_data(self, livedata, mocker):
-        watcher_mock = mocker.patch('firebasedata.live.watcher.watch')
+    def test_calls_get_data(self, livedata, mocker):
+        livedata.get_data = mocker.Mock()
+
         livedata.restart()
 
-        watcher_mock.assert_any_call(
-            'meta_{}'.format(id(livedata)),
-            callee.functions.Callable(),
-            livedata.get_data,
-            interval=callee.types.InstanceOf(datetime.timedelta)
-        )
+        assert livedata.get_data.called
 
 
 class Test_metawatcher:
@@ -278,7 +276,7 @@ class Test_metawatcher:
         livedata.start_metawatcher()
 
         watcher_mock.assert_called_with(
-            'meta_{}'.format(id(livedata)),
+            livedata.get_metawatcher_name(),
             callee.functions.Callable(),
             livedata.get_data,
             interval=callee.types.InstanceOf(datetime.timedelta)

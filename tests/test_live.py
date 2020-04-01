@@ -3,6 +3,7 @@ import datetime
 import blinker.base
 import callee
 import pytest
+from urllib3.exceptions import HTTPError
 
 from firebasedata import data, live
 
@@ -62,6 +63,14 @@ class Test_get_data:
         result = livedata.get_data()
 
         assert result is cached
+
+    def test_connection_error(self, livedata, logger, mocker):
+        livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
+
+        result = livedata.get_data()
+
+        assert result is None
+        assert logger.error.called
 
 
 class Test_set_data:
@@ -200,15 +209,24 @@ class Test_listen:
 
     def test_stream_gc_is_started(self, livedata, mocker):
         livedata._start_stream_gc = mocker.Mock()
+
         livedata.listen()
 
         assert livedata._start_stream_gc.called
 
     def test_metawatcher_is_canceled(self, livedata, mocker):
         livedata.cancel_metawatcher = mocker.Mock()
+
         livedata.listen()
 
         assert livedata.cancel_metawatcher.called
+
+    def test_connection_error(self, livedata, mocker, logger):
+        livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
+
+        livedata.listen()
+
+        assert logger.error.called
 
 
 class Test_reset:

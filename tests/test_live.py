@@ -70,8 +70,15 @@ class Test_get_data:
         with pytest.raises(HTTPError):
             livedata.get_data()
 
+    def test_get_data_silent(self, livedata, mocker):
+        livedata.get_data = mocker.Mock()
+
+        livedata.get_data_silent()
+
+        assert livedata.get_data.called
+
     def test_get_data_silent_connection_error(self, livedata, logger, mocker):
-        livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
+        livedata.get_data = mocker.Mock(side_effect=HTTPError('Test error'))
 
         result = livedata.get_data_silent()
 

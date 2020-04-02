@@ -148,7 +148,7 @@ def test_connection_recovery(livedata, mocker):
     watch_mock.assert_any_call(
         livedata.get_metawatcher_name(),
         callee.functions.Callable(),
-        livedata.get_data,
+        livedata.get_data_silent,
         interval=livedata._retry_interval
     )
 

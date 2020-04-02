@@ -67,7 +67,13 @@ class Test_get_data:
     def test_connection_error(self, livedata, logger, mocker):
         livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
 
-        result = livedata.get_data()
+        with pytest.raises(HTTPError):
+            livedata.get_data()
+
+    def test_get_data_silent_connection_error(self, livedata, logger, mocker):
+        livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
+
+        result = livedata.get_data_silent()
 
         assert result is None
         assert logger.exception.called
@@ -224,9 +230,8 @@ class Test_listen:
     def test_connection_error(self, livedata, mocker, logger):
         livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
 
-        livedata.listen()
-
-        assert logger.exception.called
+        with pytest.raises(HTTPError):
+            livedata.listen()
 
 
 class Test_reset:
@@ -278,7 +283,7 @@ class Test_metawatcher:
         watcher_mock.assert_called_with(
             livedata.get_metawatcher_name(),
             callee.functions.Callable(),
-            livedata.get_data,
+            livedata.get_data_silent,
             interval=callee.types.InstanceOf(datetime.timedelta)
         )
 

@@ -36,16 +36,18 @@ class LiveData(object):
     def get_data(self):
         if self._cache is None:
             # Fetch data now
-            try:
-                value = self._db.child(self._root_path).get().val()
-            except HTTPError:
-                logger.exception('Error getting data')
-            else:
-                self._cache = data.FirebaseData(value)
-                # Listen for updates
-                self.listen()
+            value = self._db.child(self._root_path).get().val()
+            self._cache = data.FirebaseData(value)
+            # Listen for updates
+            self.listen()
 
         return self._cache
+
+    def get_data_silent(self):
+        try:
+            return self.get_data()
+        except HTTPError:
+            logger.exception('Error getting data')
 
     def set_data(self, path, value):
         path_list = data.get_path_list(path)
@@ -76,20 +78,18 @@ class LiveData(object):
         return self.events.signal(norm_path, doc=doc)
 
     def listen(self):
-        try:
-            stream = self._db.child(self._root_path).stream(self._stream_handler)
-        except HTTPError:
-            logger.exception('Error starting stream')
-        else:
-            self._streams[id(stream)] = stream
-            self._start_stream_gc()
-            watcher.watch(
-                id(self),
-                self.is_stale,
-                self.restart,
-                interval=self._ttl
-            )
-            self.cancel_metawatcher()
+        stream = self._db.child(self._root_path).stream(self._stream_handler)
+        self._streams[id(stream)] = stream
+        self._start_stream_gc()
+        watcher.watch(
+            id(self),
+            self.is_stale,
+            self.restart,
+            interval=self._ttl
+        )
+        # If the stream and stale watcher are established,
+        # the metawatcher is no longer needed.
+        self.cancel_metawatcher()
 
     def get_metawatcher_name(self):
         return 'meta_{}'.format(id(self))
@@ -98,7 +98,7 @@ class LiveData(object):
         watcher.watch(
             self.get_metawatcher_name(),
             lambda: self._cache is None,
-            self.get_data,
+            self.get_data_silent,
             interval=self._retry_interval
         )
 
@@ -108,7 +108,7 @@ class LiveData(object):
     def restart(self):
         self.reset()
         self.start_metawatcher()
-        self.get_data()
+        self.get_data_silent()
 
     def reset(self):
         logger.debug('Resetting all data')

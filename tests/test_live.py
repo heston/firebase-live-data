@@ -1,7 +1,9 @@
 import datetime
 
 import blinker.base
+import callee
 import pytest
+from urllib3.exceptions import HTTPError
 
 from firebasedata import data, live
 
@@ -61,6 +63,27 @@ class Test_get_data:
         result = livedata.get_data()
 
         assert result is cached
+
+    def test_connection_error(self, livedata, logger, mocker):
+        livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
+
+        with pytest.raises(HTTPError):
+            livedata.get_data()
+
+    def test_get_data_silent(self, livedata, mocker):
+        livedata.get_data = mocker.Mock()
+
+        livedata.get_data_silent()
+
+        assert livedata.get_data.called
+
+    def test_get_data_silent_connection_error(self, livedata, logger, mocker):
+        livedata.get_data = mocker.Mock(side_effect=HTTPError('Test error'))
+
+        result = livedata.get_data_silent()
+
+        assert result is None
+        assert logger.exception.called
 
 
 class Test_set_data:
@@ -199,9 +222,23 @@ class Test_listen:
 
     def test_stream_gc_is_started(self, livedata, mocker):
         livedata._start_stream_gc = mocker.Mock()
+
         livedata.listen()
 
         assert livedata._start_stream_gc.called
+
+    def test_metawatcher_is_canceled(self, livedata, mocker):
+        livedata.cancel_metawatcher = mocker.Mock()
+
+        livedata.listen()
+
+        assert livedata.cancel_metawatcher.called
+
+    def test_connection_error(self, livedata, mocker, logger):
+        livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
+
+        with pytest.raises(HTTPError):
+            livedata.listen()
 
 
 class Test_reset:
@@ -221,15 +258,49 @@ class Test_reset:
 class Test_restart:
     def test_calls_reset(self, livedata, mocker):
         livedata.reset = mocker.Mock()
+
         livedata.restart()
 
         assert livedata.reset.called
 
-    def test_resets_get_data(self, livedata, mocker):
+    def test_calls_start_metawatcher(self, livedata, mocker):
+        livedata.start_metawatcher = mocker.Mock()
+
+        livedata.restart()
+
+        assert livedata.start_metawatcher.called
+
+    def test_calls_get_data(self, livedata, mocker):
         livedata.get_data = mocker.Mock()
+
         livedata.restart()
 
         assert livedata.get_data.called
+
+
+class Test_metawatcher:
+    def test_get_metawatcher_name(self, livedata):
+        name = livedata.get_metawatcher_name()
+        assert 'meta_{}'.format(id(livedata)) == name
+
+    def test_start_metawatcher(self, livedata, mocker):
+        watcher_mock = mocker.patch('firebasedata.live.watcher.watch')
+        livedata.start_metawatcher()
+
+        watcher_mock.assert_called_with(
+            livedata.get_metawatcher_name(),
+            callee.functions.Callable(),
+            livedata.get_data_silent,
+            interval=callee.types.InstanceOf(datetime.timedelta)
+        )
+
+    def test_cancel_metawatcher(self, livedata, mocker):
+        name = 'metawatcher'
+        watcher_mock = mocker.patch('firebasedata.live.watcher.cancel')
+        livedata.get_metawatcher_name = lambda: name
+        livedata.cancel_metawatcher()
+
+        watcher_mock.assert_called_with(name)
 
 
 class Test_hangup:

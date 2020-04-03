@@ -1,6 +1,9 @@
 import datetime
+import time
 
+import callee
 import pytest
+from urllib3.exceptions import HTTPError
 
 from firebasedata import data, live
 
@@ -125,3 +128,36 @@ def test_signal_propagation__leaf(livedata, firebase_data, mocker):
         path='/foo/bar/baz',
         value='hola'
     )
+
+
+@pytest.mark.slow
+def test_connection_recovery(livedata, mocker):
+    watch_mock = mocker.Mock(wraps=live.watcher.watch)
+    cancel_mock = mocker.Mock(wraps=live.watcher.cancel)
+    live.watcher.watch = watch_mock
+    live.watcher.cancel = cancel_mock
+    livedata._cache = None
+    livedata._ttl = datetime.timedelta(seconds=1)
+    livedata._retry_interval = datetime.timedelta(seconds=2)
+    livedata.is_stale = lambda: True
+    livedata._db.child = mocker.Mock(side_effect=HTTPError('Test error'))
+
+    livedata.restart()
+    time.sleep(3)
+
+    watch_mock.assert_any_call(
+        livedata.get_metawatcher_name(),
+        callee.functions.Callable(),
+        livedata.get_data_silent,
+        interval=livedata._retry_interval
+    )
+
+    livedata._db.child = mocker.Mock()
+    livedata.is_stale = lambda: False
+
+    time.sleep(3)
+
+    cancel_mock.assert_any_call(
+        'meta_{}'.format(id(livedata))
+    )
+    assert isinstance(livedata._cache, data.FirebaseData)

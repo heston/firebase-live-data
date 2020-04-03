@@ -1,6 +1,7 @@
 argh==0.26.2
 attrs==17.4.0
 blinker==1.4
+callee==0.3.1
 certifi==2018.1.18
 chardet==3.0.4
 colorama==0.3.9

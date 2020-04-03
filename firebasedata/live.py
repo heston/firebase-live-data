@@ -4,18 +4,23 @@ import queue
 import threading
 
 from blinker.base import Namespace
+from urllib3.exceptions import HTTPError
 
 from . import data
 from . import watcher
 
 logger = logging.getLogger(__name__)
+RETRY_INTERVAL = datetime.timedelta(minutes=1)
 
 
 class LiveData(object):
-    def __init__(self, pyrebase_app, root_path, ttl=None):
+    def __init__(self, pyrebase_app, root_path, ttl=None, retry_interval=None):
         self._app = pyrebase_app
         self._root_path = root_path
         self._ttl = ttl
+        self._retry_interval = (
+            RETRY_INTERVAL if retry_interval is None else retry_interval
+        )
         self._db = self._app.database()
         self._streams = {}
         self._gc_streams = queue.Queue()
@@ -37,6 +42,12 @@ class LiveData(object):
             self.listen()
 
         return self._cache
+
+    def get_data_silent(self):
+        try:
+            return self.get_data()
+        except HTTPError:
+            logger.exception('Error getting data')
 
     def set_data(self, path, value):
         path_list = data.get_path_list(path)
@@ -76,10 +87,28 @@ class LiveData(object):
             self.restart,
             interval=self._ttl
         )
+        # If the stream and stale watcher are established,
+        # the metawatcher is no longer needed.
+        self.cancel_metawatcher()
+
+    def get_metawatcher_name(self):
+        return 'meta_{}'.format(id(self))
+
+    def start_metawatcher(self):
+        watcher.watch(
+            self.get_metawatcher_name(),
+            lambda: self._cache is None,
+            self.get_data_silent,
+            interval=self._retry_interval
+        )
+
+    def cancel_metawatcher(self):
+        watcher.cancel(self.get_metawatcher_name())
 
     def restart(self):
         self.reset()
-        self.get_data()
+        self.start_metawatcher()
+        self.get_data_silent()
 
     def reset(self):
         logger.debug('Resetting all data')

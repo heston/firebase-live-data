@@ -4,7 +4,6 @@ import queue
 import threading
 
 from blinker.base import Namespace
-from urllib3.exceptions import HTTPError
 
 from . import data
 from . import watcher
@@ -46,7 +45,7 @@ class LiveData(object):
     def get_data_silent(self):
         try:
             return self.get_data()
-        except HTTPError:
+        except Exception:
             logger.exception('Error getting data')
 
     def set_data(self, path, value):

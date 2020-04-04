@@ -78,7 +78,7 @@ class Test_get_data:
         assert livedata.get_data.called
 
     def test_get_data_silent_connection_error(self, livedata, logger, mocker):
-        livedata.get_data = mocker.Mock(side_effect=HTTPError('Test error'))
+        livedata.get_data = mocker.Mock(side_effect=OSError('SSL error'))
 
         result = livedata.get_data_silent()
 

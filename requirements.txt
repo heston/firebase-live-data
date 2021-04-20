@@ -13,7 +13,7 @@ mccabe==0.6.1
 pathtools==0.1.2
 pkginfo==1.4.1
 pluggy==0.6.0
-py==1.5.2
+py==1.10.0
 pycodestyle==2.4.0
 pyflakes==2.0.0
 pytest==3.4.0

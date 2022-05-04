@@ -1,6 +1,6 @@
 blinker==1.4
 callee==0.3.1
-flake8==3.6.0
+flake8==4.0.1
 pip-tools==6.6.0
 pytest==7.1.2
 pytest-cov==3.0.0

@@ -147,6 +147,14 @@ def test_cancel__known_name(mocker):
     assert watcher_stub.cancel.called
 
 
+def test_cancel__known_name__empty_value():
+    watcher._watchers['something'] = None
+    result = watcher.cancel('something')
+
+    assert result is True
+    assert 'something' not in watcher._watchers
+
+
 def test_cancel_all(mocker):
     watcher_stub1 = mocker.Mock()
     watcher_stub2 = mocker.Mock()

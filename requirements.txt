@@ -22,10 +22,14 @@ colorama==0.3.9
     # via pytest-watch
 coverage[toml]==6.3.2
     # via
+    #   coveralls
     #   pytest-cov
-    #   python-coveralls
+coveralls==3.3.1
+    # via -r requirements.in
 docopt==0.6.2
-    # via pytest-watch
+    # via
+    #   coveralls
+    #   pytest-watch
 flake8==4.0.1
     # via -r requirements.in
 idna==2.6
@@ -64,16 +68,10 @@ pytest-mock==3.7.0
     # via -r requirements.in
 pytest-watch==4.2.0
     # via -r requirements.in
-python-coveralls==2.9.3
-    # via -r requirements.in
 pyyaml==5.4
-    # via
-    #   python-coveralls
-    #   watchdog
+    # via watchdog
 requests==2.20.1
-    # via python-coveralls
-six==1.11.0
-    # via python-coveralls
+    # via coveralls
 tomli==2.0.1
     # via
     #   coverage

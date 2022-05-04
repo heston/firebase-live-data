@@ -13,3 +13,9 @@ logging.basicConfig(
     format='[%(asctime)s] %(levelname)s %(name)s: %(message)s',
     level=logging.DEBUG
 )
+
+
+def pytest_configure(config):
+    config.addinivalue_line(
+        "markers", "slow: marks tests as slow (deselect with '-m \"not slow\""
+    )

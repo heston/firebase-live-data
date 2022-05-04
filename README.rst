@@ -79,7 +79,7 @@ locally, like the example above, or via server push events.
 Compatibility
 -------------
 
-Firebase Live Data is tested against Python 3.4, 3.5, and 3.6. It is not
+Firebase Live Data is tested against Python 3.7, 3.8, 3.9 and 3.10. It is not
 compatible with Python 2.
 
 Developing
@@ -97,7 +97,7 @@ Developing
 
        py.test
 
-.. |Build Status| image:: https://travis-ci.org/heston/firebase-live-data.svg?branch=master
-   :target: https://travis-ci.org/heston/firebase-live-data
+.. |Build Status| image:: https://github.com/heston/firebase-live-data/actions/workflows/pytest.yml/badge.svg?branch=master
+   :target: https://github.com/heston/firebase-live-data/actions/workflows/pytest.yml?query=branch%3Amaster
 .. |Coverage Status| image:: https://coveralls.io/repos/github/heston/firebase-live-data/badge.svg?branch=master
    :target: https://coveralls.io/github/heston/firebase-live-data?branch=master

@@ -40,7 +40,7 @@ that is outside the scope of this document.
 
 ## Compatibility
 
-Firebase Live Data is tested against Python 3.4, 3.5, and 3.6. It is not compatible with
+Firebase Live Data is tested against Python 3.7, 3.8, 3.9 and 3.10. It is not compatible with
 Python 2.
 
 ## Usage

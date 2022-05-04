@@ -592,3 +592,11 @@ class Test_stream_gc:
         assert stream.close.called
         logger.debug.assert_any_call('Closing stream: %s', stream)
         logger.warning.assert_any_call('Error closing stream %s: %s', stream, mocker.ANY)
+
+    def test_start_stream_gc_idempotent(self, livedata, mocker, logger):
+        thread = mocker.Mock()
+
+        livedata._gc_thread = thread
+        livedata._start_stream_gc()
+
+        assert livedata._gc_thread is thread

@@ -20,10 +20,10 @@ jobs:
         pip install -r requirements.txt
     - name: Running pytest
       run: pytest --cov=firebasedata --cov-branch
-    - name: Coveralls
+    - name: Upload coverage stats to coveralls.io
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        COVERALLS_FLAG_NAME: ${{ matrix.test-name }}
+        COVERALLS_FLAG_NAME: python-${{ matrix.python-version }}
         COVERALLS_PARALLEL: true
       run: coveralls --service=github
 
@@ -34,8 +34,8 @@ jobs:
     container: python:3-slim
     steps:
       - name: Finished
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pip3 install --upgrade coveralls
           coveralls --service=github --finish
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

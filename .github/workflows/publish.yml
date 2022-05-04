@@ -8,10 +8,9 @@
 
 name: Upload Python Package
 
-on: [push]
-# on:
-#   release:
-#     types: [published]
+on:
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -27,10 +26,8 @@ jobs:
         python-version: '3.10'
     - name: Build sdist
       run: python setup.py sdist
-    # - name: Publish package
-    #   uses: pypa/gh-action-pypi-publish
-    #   with:
-    #     name: sdist
-    #     path: dist
-    #     user: __token__
-    #     password: ${{ secrets.PYPI_API_TOKEN }}
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1.5
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}

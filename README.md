@@ -23,11 +23,9 @@ Firebase Live Data abstracts these concepts into simple `blinker` signals that a
 
 ## Installing
 
-```shell
-pip install FirebaseData Pyrebase
+```bash
+pip install FirebaseData -e git+https://github.com/heston/Pyrebase.git@a77bd6f6def656b1dcd77d938fac2707f3c4ba61#egg=Pyrebase
 ```
-
-The Python Tutorial has more details about this command and [virtual environments](https://docs.python.org/3/tutorial/venv.html).
 
 ## Dependencies
 

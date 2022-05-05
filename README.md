@@ -33,15 +33,19 @@ The Python Tutorial has more details about this command and [virtual environment
 
 Firebase Live Data has a direct dependency on
 [Blinker](https://pypi.python.org/pypi/blinker), and a peer dependency on
-[Pyrebase](https://pypi.python.org/pypi/Pyrebase). This means that Blinker will be
+[Pyrebase](https://pypi.python.org/pypi/Pyrebase) (see note below). This means that Blinker will be
 installed automatically, while Pyrebase must be installed separately (hence its inclusion
-in the `pip` command above). This is because Pyrebase requires [additional configuration](https://github.com/thisbejim/Pyrebase#add-pyrebase-to-your-application)
-that is outside the scope of this document.
+in the `pip` command above). This is because Pyrebase requires [additional configuration](https://github.com/thisbejim/Pyrebase#add-pyrebase-to-your-application) that is outside the scope of this document.
+
+**A note on Pyrebase maintenance**: It seems that Pyrebase is longer being actively maintained, unfortunately. Please use [this author's fork](https://github.com/heston/Pyrebase/tree/upgrade-google-auth) to get things working:
+
+```
+pip install -e git+https://github.com/heston/Pyrebase.git@a77bd6f6def656b1dcd77d938fac2707f3c4ba61#egg=Pyrebase
+```
 
 ## Compatibility
 
-Firebase Live Data is tested against Python 3.7, 3.8, 3.9 and 3.10. It is not compatible with
-Python 2.
+Firebase Live Data is tested against Python 3.7, 3.8, 3.9 and 3.10. It is not compatible with Python 2.
 
 ## Usage
 
@@ -101,11 +105,13 @@ example above, or via server push events.
 1. Install the development requirements (preferably into a virtualenv):
 
     ```bash
+    python3 -m venv venv
+    source venv/bin/activate
     pip install -r requirements.txt
     ```
 
 2. Run tests to ensure everything works:
 
     ```bash
-    py.test
+    pytest
     ```

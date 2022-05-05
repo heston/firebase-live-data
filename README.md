@@ -35,7 +35,7 @@ Firebase Live Data has a direct dependency on
 installed automatically, while Pyrebase must be installed separately (hence its inclusion
 in the `pip` command above). This is because Pyrebase requires [additional configuration](https://github.com/thisbejim/Pyrebase#add-pyrebase-to-your-application) that is outside the scope of this document.
 
-**A note on Pyrebase maintenance**: It seems that Pyrebase is longer being actively maintained, unfortunately. Please use [this author's fork](https://github.com/heston/Pyrebase/tree/upgrade-google-auth) to get things working:
+**A note on Pyrebase maintenance**: It seems that Pyrebase is no longer being actively maintained, unfortunately. Please use [this author's fork](https://github.com/heston/Pyrebase/tree/upgrade-google-auth) to get things working:
 
 ```
 pip install -e git+https://github.com/heston/Pyrebase.git@a77bd6f6def656b1dcd77d938fac2707f3c4ba61#egg=Pyrebase

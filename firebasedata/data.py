@@ -92,8 +92,10 @@ class FirebaseData(dict):
         node = self.get_node_for_path(path)
 
         if not node.key:
+            # We're at the root node
             if value is None:
                 node.value.clear()
+                node.value._default_value = None
             else:
                 self._update(node.value, value)
         else:

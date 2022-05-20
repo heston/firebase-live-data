@@ -86,6 +86,48 @@ def test_signal_propagation__root(livedata, firebase_data, mocker):
     )
 
 
+def test_signal_propagation__set_root_to_none(livedata, firebase_data, mocker):
+    """Test what happens when the root node is set to None."""
+
+    mock_handler = mocker.MagicMock()
+
+    def handler(*args, **kwargs):
+        mock_handler(*args, **kwargs)
+
+    livedata.signal('/').connect(handler)
+
+    message = {
+        'path': '/',
+        'data': 'hola',
+        'event': 'put',
+    }
+    livedata._stream_handler(message)
+
+    assert firebase_data.get() == 'hola'
+
+    message = {
+        'path': '/',
+        'data': None,
+        'event': 'put',
+    }
+    livedata._stream_handler(message)
+
+    assert firebase_data.get() is None
+
+    mock_handler.assert_has_calls([
+        mocker.call(
+            firebase_data,
+            path='/',
+            value='hola'
+        ),
+        mocker.call(
+            firebase_data,
+            path='/',
+            value=None
+        )
+    ])
+
+
 def test_signal_propagation__node(livedata, firebase_data, mocker):
     mock_handler = mocker.MagicMock()
 

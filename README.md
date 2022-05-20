@@ -1,6 +1,6 @@
 # Firebase Live Data
 
-[![Build Status](https://github.com/heston/firebase-live-data/actions/workflows/pytest.yml/badge.svg?branch=master)](https://github.com/heston/firebase-live-data/actions/workflows/pytest.yml?query=branch%3Amaster)
+[![PyPI version](https://badge.fury.io/py/FirebaseData.svg)](https://badge.fury.io/py/FirebaseData)[![Build Status](https://github.com/heston/firebase-live-data/actions/workflows/pytest.yml/badge.svg?branch=master)](https://github.com/heston/firebase-live-data/actions/workflows/pytest.yml?query=branch%3Amaster)
 [![Coverage Status](https://coveralls.io/repos/github/heston/firebase-live-data/badge.svg?branch=master)](https://coveralls.io/github/heston/firebase-live-data?branch=master)
 
 Utilities for storing, retrieving, and monitoring Firebase Realtime Database objects in

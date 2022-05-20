@@ -223,3 +223,17 @@ class TestFirebaseData_single_value:
         result = data.get('/foo/bar')
 
         assert result == 1
+
+    def test_set_str_initially_then_set_none(self):
+        data = firebase_data.FirebaseData('hello')
+        data.set('/', None)
+        result = data.get()
+
+        assert result is None
+
+    def test_set_dict_initially_then_set_none(self):
+        data = firebase_data.FirebaseData({'foo': 'bar'})
+        data.set('/', None)
+        result = data.get()
+
+        assert result is None

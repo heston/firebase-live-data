@@ -75,7 +75,7 @@ urllib3==1.26.9
     # via requests
 watchdog==2.1.7
     # via pytest-watch
-wheel==0.37.1
+wheel==0.38.1
     # via pip-tools
 
 # The following packages are considered to be unsafe in a requirements file:
